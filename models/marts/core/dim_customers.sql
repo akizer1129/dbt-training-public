@@ -25,7 +25,6 @@ customer_orders as (
 
 ),
 
-
 final as (
 
     select
