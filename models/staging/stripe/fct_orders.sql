@@ -1,36 +1,32 @@
 
-with customers as (
-
-    select * from {{ ref('stg_customers')}} -- ANALYTICS.DBT_AKIZER.STG_CUSTOMERS--
-
-),
-
-orders as (
-
-    select * from {{ ref('stg_orders') }} -- ANALYTICS.DBT_AKIZER.STG_ORDERS--
-
+with orders as  (
+    select * from {{ ref('stg_orders' )}}
 ),
 
 payments as (
-
-    select * from {{ ref('stg_payments') }} -- ANALYTICS.DBT_AKIZER.STG_PAYMENTS--
-
- 
-
+    select * from {{ ref('stg_payments') }}
 ),
 
-fct_orders as (
+order_payments as (
+    select
+        order_id,
+        sum(case when status = 'success' then amount end) as amount
+
+    from payments
+    group by 1
+),
+
+final as (
 
     select
-             orders.ORDER_ID
-            ,orders.CUSTOMER_ID
-            ,payments.AMOUNT
-     
+        orders.order_id,
+        orders.customer_id,
+        orders.order_date,
+        coalesce(order_payments.amount, 0) as amount
 
-    from  orders
-
-    left join  payments on (orders.ORDER_ID=payments.ORDERID)
-
+    from orders
+    left join order_payments using (order_id)
 )
 
-select * from fct_orders
+select * from final
+
