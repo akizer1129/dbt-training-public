@@ -1,0 +1,17 @@
+version: 2
+
+sources:
+  - name: stripe
+    description: A clone of the prostgres application database  
+    database: raw
+    tables:
+      - name: payment
+        description: raw payment data  
+        columns: 
+            - name: payment_id
+              description: primary key for customers
+              tests:
+                - unique
+                - not_null
+
+  
